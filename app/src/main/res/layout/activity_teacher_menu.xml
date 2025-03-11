@@ -85,49 +85,14 @@
                 android:columnCount="2"
                 android:useDefaultMargins="true">
 
-                <!-- Upload Test Card -->
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/cardUploadTest"
-                    android:layout_width="0dp"
-                    android:layout_height="160dp"
-                    android:layout_columnWeight="1"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginBottom="16dp"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-
-                        <ImageView
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
-                            android:layout_marginBottom="16dp"
-                            android:contentDescription="Upload Test"
-                            android:padding="15dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Upload a New Test"
-                            android:textAlignment="center"
-                            android:textColor="#212121"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
-
-                <!-- Existing Tests Card -->
+                <!-- Tests Card (Combined) -->
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardExistingTests"
                     android:layout_width="0dp"
                     android:layout_height="160dp"
                     android:layout_columnWeight="1"
                     android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
                     android:layout_marginBottom="16dp"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="4dp">
@@ -143,70 +108,15 @@
                             android:layout_width="70dp"
                             android:layout_height="70dp"
                             android:layout_marginBottom="16dp"
-                            android:contentDescription="Existing Tests"
+                            android:contentDescription="Tests"
                             android:padding="15dp"
                             />
 
                         <TextView
+                            android:id="@+id/cardTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Existing Tests"
-                            android:textAlignment="center"
-                            android:textColor="#212121"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
-
-                <!-- Student Requests Card -->
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/cardStudentRequests"
-                    android:layout_width="0dp"
-                    android:layout_height="160dp"
-                    android:layout_columnWeight="1"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginBottom="16dp"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-
-                        <FrameLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="16dp">
-
-                            <ImageView
-                                android:layout_width="70dp"
-                                android:layout_height="70dp"
-                                android:contentDescription="Student Requests"
-                                android:padding="15dp"
-                                />
-
-                            <!-- Red notification badge -->
-                            <TextView
-                                android:id="@+id/requestsBadge"
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:layout_gravity="top|end"
-                                android:background="@drawable/notification_badge"
-                                android:gravity="center"
-                                android:text="!"
-                                android:textColor="#FFFFFF"
-                                android:textSize="12sp"
-                                android:textStyle="bold"
-                                android:visibility="gone" />
-                        </FrameLayout>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Student Requests"
+                            android:text="Tests"
                             android:textAlignment="center"
                             android:textColor="#212121"
                             android:textSize="16sp"
@@ -221,6 +131,7 @@
                     android:layout_height="160dp"
                     android:layout_columnWeight="1"
                     android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
                     android:layout_marginBottom="16dp"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="4dp">
@@ -238,7 +149,7 @@
                             android:layout_marginBottom="16dp"
                             android:contentDescription="Statistical Analysis"
                             android:padding="15dp"
-                          />
+                            />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -275,7 +186,7 @@
                             android:layout_marginBottom="16dp"
                             android:contentDescription="Student Tracking"
                             android:padding="15dp"
-                        />
+                            />
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -305,13 +216,32 @@
                         android:orientation="vertical"
                         android:padding="16dp">
 
-                        <ImageView
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
-                            android:layout_marginBottom="16dp"
-                            android:contentDescription="Student Chat"
-                            android:padding="15dp"
-                            />
+                        <FrameLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="16dp">
+
+                            <ImageView
+                                android:layout_width="70dp"
+                                android:layout_height="70dp"
+                                android:contentDescription="Student Chat"
+                                android:padding="15dp"
+                                />
+
+                            <!-- Notification badge -->
+                            <TextView
+                                android:id="@+id/requestsBadge"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="top|end"
+                                android:background="@drawable/notification_badge"
+                                android:gravity="center"
+                                android:text="!"
+                                android:textColor="#FFFFFF"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:visibility="gone" />
+                        </FrameLayout>
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -330,7 +260,7 @@
                     android:layout_width="0dp"
                     android:layout_height="160dp"
                     android:layout_columnWeight="1"
-                    android:layout_marginEnd="8dp"
+                    android:layout_columnSpan="2"
                     android:layout_marginBottom="16dp"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="4dp">

@@ -9,10 +9,7 @@ import androidx.cardview.widget.CardView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.FirebaseFirestore
 import android.view.View
 import android.widget.ImageView
@@ -32,11 +29,9 @@ class StudentMenuActivity : AppCompatActivity() {
 
     // Menu cards
     private lateinit var cardAvailableTests: CardView
-    private lateinit var cardCompletedTests: CardView
     private lateinit var cardTeacherInfo: CardView
     private lateinit var cardSendNote: CardView
     private lateinit var cardAcademicProgress: CardView
-    private lateinit var cardSchedule: CardView
 
     // Firebase references
     private lateinit var auth: FirebaseAuth
@@ -112,11 +107,9 @@ class StudentMenuActivity : AppCompatActivity() {
         messageBadge = findViewById(R.id.requestsBadge)
 
         cardAvailableTests = findViewById(R.id.cardAvailableTests)
-        cardCompletedTests = findViewById(R.id.cardCompletedTests)
         cardTeacherInfo = findViewById(R.id.cardTeacherInfo)
         cardSendNote = findViewById(R.id.cardSendNote)
         cardAcademicProgress = findViewById(R.id.cardAcademicProgress)
-        cardSchedule = findViewById(R.id.cardSchedule)
     }
 
     private fun fetchTeachersList() {
@@ -146,11 +139,6 @@ class StudentMenuActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        cardCompletedTests.setOnClickListener {
-            val intent = Intent(this, CompletedTestsActivity::class.java)
-            startActivity(intent)
-        }
-
         cardTeacherInfo.setOnClickListener {
             // Placeholder for teacher info functionality
         }
@@ -161,13 +149,8 @@ class StudentMenuActivity : AppCompatActivity() {
         }
 
         cardAcademicProgress.setOnClickListener {
-
             val intent = Intent(this, StudentProgressActivity::class.java)
             startActivity(intent)
-        }
-
-        cardSchedule.setOnClickListener {
-            // Placeholder for schedule functionality
         }
     }
 
@@ -206,4 +189,3 @@ class StudentMenuActivity : AppCompatActivity() {
         }
     }
 }
-

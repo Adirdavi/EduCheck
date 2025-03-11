@@ -30,7 +30,14 @@ class TeacherMenuActivity : AppCompatActivity(), View.OnClickListener {
     private var teacherId: String = ""
     private var unreadMessagesBadge: TextView? = null
     private lateinit var cardStudentChat: CardView
-    private lateinit var greetingText: TextView // Added greeting text variable
+    private lateinit var greetingText: TextView
+
+    // רכיבי ממשק חדשים - כולל כרטיס מבחנים מאוחד
+    private lateinit var cardTests: CardView  // כרטיס המבחנים המאוחד
+    private lateinit var cardStatisticalAnalysis: CardView
+    private lateinit var cardStudentTracking: CardView
+    private lateinit var cardErrorReporting: CardView
+    private lateinit var logoutButton: MaterialButton
 
     companion object {
         private const val TAG = "TeacherMenuActivity"
@@ -92,6 +99,7 @@ class TeacherMenuActivity : AppCompatActivity(), View.OnClickListener {
             checkForUnreadMessages()
 
             // Initialize all buttons and set click listeners with error handling
+            initializeUIComponents()
             initClickListeners()
 
         } catch (e: Exception) {
@@ -101,12 +109,35 @@ class TeacherMenuActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     /**
+     * Initialize UI components
+     */
+    private fun initializeUIComponents() {
+        try {
+            // אתחול הכרטיסים
+            cardTests = findViewById(R.id.cardExistingTests)          // השתמשנו בכרטיס הקיים כמבחנים מאוחד
+            cardStatisticalAnalysis = findViewById(R.id.cardStatisticalAnalysis)
+            cardStudentTracking = findViewById(R.id.cardStudentTracking)
+            cardStudentChat = findViewById(R.id.cardStudentChat)
+            cardErrorReporting = findViewById(R.id.cardErrorReporting)
+            logoutButton = findViewById(R.id.logoutButton)
+
+            // עדכון הטקסט של כרטיס המבחנים המאוחד
+            val testsCardText = cardTests.findViewById<TextView>(R.id.cardTitle)
+            if (testsCardText != null) {
+                testsCardText.text = "Tests"
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error initializing UI components: ${e.message}")
+        }
+    }
+
+    /**
      * Fetch teacher's first name from Firebase Realtime Database
      */
     private fun fetchTeacherFirstNameFromRTDB(teacherId: String) {
         try {
             // Try the teachers path
-            val teacherRef = database.getReference("teachers").child(teacherId)
+            val teacherRef = database.getReference("users").child(teacherId)
 
             teacherRef.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -136,65 +167,15 @@ class TeacherMenuActivity : AppCompatActivity(), View.OnClickListener {
                                 }
                             }
                         }
-
-                        // No name found, try users path
-                        tryUsersPath()
-                    } else {
-                        // No data, try users path
-                        tryUsersPath()
                     }
+
+                    // Default fallback
+                    greetingText.text = "Hello, Teacher!"
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    // Error with teachers path, try users path
-                    tryUsersPath()
-                }
-
-                // Try the users path as a fallback
-                private fun tryUsersPath() {
-                    database.getReference("users").child(teacherId)
-                        .addListenerForSingleValueEvent(object : ValueEventListener {
-                            override fun onDataChange(usersSnapshot: DataSnapshot) {
-                                if (usersSnapshot.exists()) {
-                                    // Try different field names for first name
-                                    val possibleFirstNameFields = listOf(
-                                        "firstName", "firstname", "first_name", "FirstName", "name", "Name"
-                                    )
-
-                                    // Try each possible field name
-                                    for (fieldName in possibleFirstNameFields) {
-                                        val firstName = usersSnapshot.child(fieldName).getValue(String::class.java)
-                                        if (!firstName.isNullOrEmpty()) {
-                                            greetingText.text = "Hello, $firstName!"
-                                            return
-                                        }
-                                    }
-
-                                    // Try checking root level
-                                    val completeSnapshot = usersSnapshot.getValue(HashMap::class.java)
-                                    if (completeSnapshot != null) {
-                                        for (fieldName in possibleFirstNameFields) {
-                                            val value = completeSnapshot[fieldName]
-                                            if (value != null && value is String && value.isNotEmpty()) {
-                                                greetingText.text = "Hello, $value!"
-                                                return
-                                            }
-                                        }
-                                    }
-
-                                    // Default fallback
-                                    greetingText.text = "Hello, Teacher!"
-                                } else {
-                                    // Default fallback
-                                    greetingText.text = "Hello, Teacher!"
-                                }
-                            }
-
-                            override fun onCancelled(error: DatabaseError) {
-                                // Default fallback
-                                greetingText.text = "Hello, Teacher!"
-                            }
-                        })
+                    // Default fallback
+                    greetingText.text = "Hello, Teacher!"
                 }
             })
         } catch (e: Exception) {
@@ -218,33 +199,13 @@ class TeacherMenuActivity : AppCompatActivity(), View.OnClickListener {
      */
     private fun initClickListeners() {
         try {
-            // List of buttons we want to initialize
-            val buttonIds = listOf(
-                R.id.cardUploadTest,
-                R.id.cardExistingTests,
-                R.id.cardStatisticalAnalysis,
-                R.id.cardStudentTracking,
-                R.id.cardStudentChat,
-                R.id.cardErrorReporting,
-                R.id.logoutButton
-            )
-
-            // Go through each ID and try to find it and set a click listener
-            for (id in buttonIds) {
-                try {
-                    val view = findViewById<View>(id)
-                    view.setOnClickListener(this)
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error finding or setting listener for view with ID $id: ${e.message}")
-                }
-            }
-
-            // Initialize the student chat card
-            try {
-                cardStudentChat = findViewById(R.id.cardStudentChat)
-            } catch (e: Exception) {
-                Log.e(TAG, "Error finding cardStudentChat: ${e.message}")
-            }
+            // הגדרת המאזינים לאירועי לחיצה
+            cardTests.setOnClickListener(this)
+            cardStatisticalAnalysis.setOnClickListener(this)
+            cardStudentTracking.setOnClickListener(this)
+            cardStudentChat.setOnClickListener(this)
+            cardErrorReporting.setOnClickListener(this)
+            logoutButton.setOnClickListener(this)
         } catch (e: Exception) {
             Log.e(TAG, "Error in initClickListeners: ${e.message}")
         }
@@ -287,27 +248,15 @@ class TeacherMenuActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(view: View) {
         try {
             when(view.id) {
-                R.id.cardUploadTest -> {
-                    // Navigate to create new test screen
-                    try {
-                        val intent = Intent(this, CreateTestActivity::class.java)
-                        startActivity(intent)
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Error navigating to CreateTestActivity: ${e.message}")
-                        Toast.makeText(this, "Error navigating to create test screen: ${e.message}", Toast.LENGTH_SHORT).show()
-                    }
-                }
                 R.id.cardExistingTests -> {
-
+                    // פתיחת מסך המבחנים המאוחד
                     try {
                         val intent = Intent(this, TestsActivity::class.java)
                         intent.putExtra("IS_TEACHER", true)
-                        intent.putExtra("CALLING_ACTIVITY", "TeacherMenuActivity")
-                        Log.d(TAG, "Opening TestsActivity as teacher")
                         startActivity(intent)
                     } catch (e: Exception) {
                         Log.e(TAG, "Error navigating to TestsActivity: ${e.message}")
-                        Toast.makeText(this, "Error showing existing tests: ${e.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Error opening tests screen: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
                 }
                 R.id.cardStatisticalAnalysis -> {

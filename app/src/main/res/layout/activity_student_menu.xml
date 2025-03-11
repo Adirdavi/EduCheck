@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F0F4F8"
+    android:background="@drawable/background"
     android:layoutDirection="ltr"
     tools:context=".StudentMenuActivity">
 
@@ -124,7 +124,7 @@
             android:columnCount="2"
             android:useDefaultMargins="true">
 
-            <!-- Available Tests Card -->
+            <!-- Tests Card (Combined) -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardAvailableTests"
                 android:layout_width="0dp"
@@ -145,45 +145,12 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:layout_marginBottom="8dp"
-                        android:contentDescription="Available Tests" />
+                        android:contentDescription="Tests" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Available Tests"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textAlignment="center" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Completed Tests Card -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardCompletedTests"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1"
-                android:layout_marginBottom="12dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="16dp">
-
-                    <ImageView
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
-                        android:layout_marginBottom="8dp"
-                        android:contentDescription="Tests I Have Taken" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Tests I Have Taken"
+                        android:text="Tests"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:textAlignment="center" />
@@ -223,7 +190,7 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Chat with Teachers Card (renamed from Send Note) -->
+            <!-- Chat with Teachers Card -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardSendNote"
                 android:layout_width="0dp"
@@ -301,39 +268,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Academic Progress"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textAlignment="center" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Class Schedule Card -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardSchedule"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1"
-                android:layout_marginBottom="12dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:padding="16dp">
-
-                    <ImageView
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
-                        android:layout_marginBottom="8dp"
-                        android:contentDescription="Class Schedule" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Class Schedule"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:textAlignment="center" />
