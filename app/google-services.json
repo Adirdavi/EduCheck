@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "1082420985864",
+    "firebase_url": "https://educheck-ca3f3-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "educheck-ca3f3",
+    "storage_bucket": "educheck-ca3f3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1082420985864:android:c6748763d83bf3fea111bd",
+        "android_client_info": {
+          "package_name": "com.example.educheck"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXeeSkehLEnrRRmaEkVEbrj9eQiGeppNM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
