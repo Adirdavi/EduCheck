@@ -216,25 +216,49 @@ class TeacherMenuActivity : AppCompatActivity(), View.OnClickListener {
             // Remove previous listener if it exists
             messagesListener?.remove()
 
-            messagesListener = firestore.collection("chat_messages")
-                .whereEqualTo("receiverId", teacherId)
-                .whereEqualTo("isRead", false)
+            // שינוי: כעת אנחנו בודקים את אוסף chats במקום chat_messages
+            messagesListener = firestore.collection("chats")
+                // נחפש צ'אטים שמשתמש זה משתתף בהם
+                .whereArrayContains("participants", teacherId)
                 .addSnapshotListener { snapshot, e ->
                     if (e != null) {
                         Log.e(TAG, "Listen failed: ${e.message}")
                         return@addSnapshotListener
                     }
 
-                    // Check if there are unread messages
-                    val hasUnreadMessages = snapshot != null && !snapshot.isEmpty
+                    if (snapshot == null || snapshot.isEmpty) {
+                        // אין צ'אטים
+                        unreadMessagesBadge?.visibility = View.GONE
+                        return@addSnapshotListener
+                    }
 
-                    // Update UI - show/hide badge
-                    unreadMessagesBadge?.visibility = if (hasUnreadMessages) View.VISIBLE else View.GONE
+                    var totalUnreadMessages = 0
 
-                    // Can also update badge text with count
-                    if (hasUnreadMessages) {
-                        val unreadCount = snapshot?.size() ?: 0
-                        unreadMessagesBadge?.text = if (unreadCount > 9) "9+" else unreadCount.toString()
+                    // נעבור על כל הצ'אטים ונספור הודעות שלא נקראו
+                    for (document in snapshot.documents) {
+                        try {
+                            @Suppress("UNCHECKED_CAST")
+                            val messages = document.get("messages") as? ArrayList<HashMap<String, Any>> ?: ArrayList()
+
+                            // נספור הודעות שנשלחו למורה ועדיין לא נקראו
+                            val unreadCount = messages.count { message ->
+                                val receiverId = message["receiverId"] as? String ?: ""
+                                val isRead = message["isRead"] as? Boolean ?: true // נניח שנקראה אם לא ידוע
+                                receiverId == teacherId && !isRead
+                            }
+
+                            totalUnreadMessages += unreadCount
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Error counting unread messages: ${e.message}")
+                        }
+                    }
+
+                    // עדכון ממשק המשתמש - הצג/הסתר באדג'
+                    unreadMessagesBadge?.visibility = if (totalUnreadMessages > 0) View.VISIBLE else View.GONE
+
+                    // עדכון מספר ההודעות שלא נקראו
+                    if (totalUnreadMessages > 0) {
+                        unreadMessagesBadge?.text = if (totalUnreadMessages > 9) "9+" else totalUnreadMessages.toString()
                     }
                 }
         } catch (e: Exception) {
@@ -268,14 +292,26 @@ class TeacherMenuActivity : AppCompatActivity(), View.OnClickListener {
                     }
                 }
                 R.id.cardStudentTracking -> {
-                    Toast.makeText(this, "Student Tracking", Toast.LENGTH_SHORT).show()
-                }
+                    try {
+                        val intent = Intent(this, StudentTrackActivity::class.java)
+                        Log.d(TAG, "Opening TrackStudentActivity")
+                        startActivity(intent)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error navigating to TestStatisticsActivity: ${e.message}")
+                        Toast.makeText(this, "Error opening statistics: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }                }
                 R.id.cardStudentChat -> {
                     // Open student selection for chat
                     openStudentChatSelection()
                 }
                 R.id.cardErrorReporting -> {
-                    Toast.makeText(this, "Error Reporting", Toast.LENGTH_SHORT).show()
+                    try {
+                        val intent = Intent(this, QuestionReportsActivity::class.java)
+                        startActivity(intent)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error opening question reports: ${e.message}")
+                        Toast.makeText(this, "Error opening reports: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
                 }
                 R.id.logoutButton -> {
                     performLogout()

@@ -23,6 +23,12 @@ import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.util.UUID
+import android.text.InputType
+import android.view.Gravity
+import android.widget.EditText
+import android.widget.LinearLayout
+import com.google.android.material.button.MaterialButton
+import com.example.educheck.utilities.QuestionReport
 
 /**
  * Activity allowing a student to take a test.
@@ -37,6 +43,7 @@ class TakeTestActivity : AppCompatActivity() {
     private lateinit var optionsRadioGroup: RadioGroup
     private lateinit var previousButton: Button
     private lateinit var nextButton: Button
+    private lateinit var reportButton: MaterialButton
     private lateinit var progressIndicator: LinearProgressIndicator
 
     // Test information
@@ -161,6 +168,22 @@ class TakeTestActivity : AppCompatActivity() {
             Log.e(TAG, "Error initializing UI: ${e.message}")
             Toast.makeText(this, "Error initializing UI: ${e.message}", Toast.LENGTH_SHORT).show()
         }
+
+        try {
+            reportButton = findViewById(R.id.reportButton)
+
+            // Hide the report button in view mode
+            if (viewMode) {
+                reportButton.visibility = View.GONE
+            } else {
+                reportButton.setOnClickListener {
+                    showReportQuestionDialog()
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error setting up report button: ${e.message}")
+        }
+
     }
 
     /**
@@ -735,6 +758,136 @@ class TakeTestActivity : AppCompatActivity() {
             finish()
         }
     }
+
+    /**
+     * Show dialog for reporting a question issue
+     */
+    private fun showReportQuestionDialog() {
+        val questions = getQuestionsToDisplay()
+        if (questions.isEmpty() || currentQuestionIndex >= questions.size) {
+            return
+        }
+
+        val question = questions[currentQuestionIndex]
+
+        // Create edit text for report description
+        val reportEditText = EditText(this).apply {
+            hint = "Describe the issue with this question"
+            setLines(5)
+            gravity = Gravity.TOP
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+        }
+
+        // Create layout for the dialog
+        val layout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(50, 30, 50, 30)
+            addView(reportEditText)
+        }
+
+        // Create and show the dialog
+        AlertDialog.Builder(this)
+            .setTitle("Report Question Issue")
+            .setMessage("Please explain what's wrong with this question:")
+            .setView(layout)
+            .setPositiveButton("Submit") { _, _ ->
+                val reportText = reportEditText.text.toString().trim()
+                if (reportText.isNotEmpty()) {
+                    submitQuestionReport(question, reportText)
+                } else {
+                    Toast.makeText(this, "Please provide details about the issue", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    /**
+     * Submit the question report to Firebase
+     */
+    private fun submitQuestionReport(question: Question, reportText: String) {
+        try {
+            // Show loading indicator
+            val loadingIndicator = findViewById<ProgressBar>(R.id.loadingIndicator)
+            loadingIndicator?.visibility = View.VISIBLE
+
+            // Get student information
+            val studentId = auth.currentUser?.uid ?: "unknown"
+
+            // Get student name from Firebase
+            firestore.collection("users").document(studentId)
+                .get()
+                .addOnSuccessListener { document ->
+                    val firstName = document.getString("firstName") ?: ""
+                    val lastName = document.getString("lastName") ?: ""
+                    val studentName = "$firstName $lastName"
+
+                    // Create report object
+                    val report = QuestionReport(
+                        testId = testId,
+                        testTitle = currentTest.title,
+                        questionId = question.id,
+                        questionText = question.text,
+                        reportedBy = studentId,
+                        studentName = studentName,
+                        reportText = reportText,
+                        teacherId = currentTest.createdBy
+                    )
+
+                    // Save to Firebase
+                    firestore.collection("question_reports")
+                        .document(report.id)
+                        .set(report)
+                        .addOnSuccessListener {
+                            loadingIndicator?.visibility = View.GONE
+                            Toast.makeText(this, "Report submitted successfully", Toast.LENGTH_SHORT).show()
+                        }
+                        .addOnFailureListener { e ->
+                            loadingIndicator?.visibility = View.GONE
+                            Log.e(TAG, "Error submitting report: ${e.message}")
+                            Toast.makeText(this, "Error submitting report: ${e.message}", Toast.LENGTH_LONG).show()
+                        }
+                }
+                .addOnFailureListener { e ->
+                    loadingIndicator?.visibility = View.GONE
+                    Log.e(TAG, "Error getting student info: ${e.message}")
+
+                    // Submit report anyway with unknown student name
+                    submitReportWithUnknownStudentName(question, reportText, studentId)
+                }
+        } catch (e: Exception) {
+            Log.e(TAG, "General error submitting report: ${e.message}")
+            Toast.makeText(this, "Error submitting report: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    /**
+     * Submit report when student name can't be retrieved
+     */
+    private fun submitReportWithUnknownStudentName(question: Question, reportText: String, studentId: String) {
+        val report = QuestionReport(
+            testId = testId,
+            testTitle = currentTest.title,
+            questionId = question.id,
+            questionText = question.text,
+            reportedBy = studentId,
+            studentName = "Unknown Student",
+            reportText = reportText,
+            teacherId = currentTest.createdBy
+        )
+
+        firestore.collection("question_reports")
+            .document(report.id)
+            .set(report)
+            .addOnSuccessListener {
+                Toast.makeText(this, "Report submitted successfully", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener { e ->
+                Log.e(TAG, "Error submitting report: ${e.message}")
+                Toast.makeText(this, "Error submitting report: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+    }
+
 }
 
 

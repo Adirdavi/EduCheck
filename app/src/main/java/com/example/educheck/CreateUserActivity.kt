@@ -9,6 +9,7 @@ import android.util.Patterns
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.RadioGroup
 import android.widget.TextView
@@ -100,6 +101,13 @@ class CreateUserActivity : AppCompatActivity() {
         try {
             registerButton.setOnClickListener { registerUser() }
 
+            val backButton = findViewById<ImageButton>(R.id.backButton)
+
+            // הוספת מאזין אירועים
+            backButton.setOnClickListener {
+                // פעולה בעת לחיצה על הכפתור
+                onBackPressed() // או finish() כדי לסגור את האקטיביטי
+            }
             // Navigate to login screen
             loginPrompt.setOnClickListener {
                 startActivity(Intent(this, LoginActivity::class.java))

@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -107,6 +108,12 @@ class TestStatisticsDetailActivity : AppCompatActivity() {
             progressIndicator = findViewById(R.id.progressIndicator)
             noDataTextView = findViewById(R.id.noDataTextView)
 
+            val backButton: ImageButton = findViewById(R.id.backButton)
+            backButton.setOnClickListener {
+                // חזרה למסך הקודם
+                onBackPressed()
+            }
+
             // Set test title
             testTitleTextView.text = testTitle
 
@@ -150,14 +157,20 @@ class TestStatisticsDetailActivity : AppCompatActivity() {
             scoresDistributionChart.setDrawGridBackground(false)
             scoresDistributionChart.setDrawBarShadow(false)
             scoresDistributionChart.setDrawValueAboveBar(true)
+
+            // Disable all interactions
+            scoresDistributionChart.setTouchEnabled(false)  // Disable all touch interactions
             scoresDistributionChart.setPinchZoom(false)
             scoresDistributionChart.isDoubleTapToZoomEnabled = false
+            scoresDistributionChart.isClickable = false
+            scoresDistributionChart.isLongClickable = false
 
             // Configure X axis
             val xAxis = scoresDistributionChart.xAxis
             xAxis.position = com.github.mikephil.charting.components.XAxis.XAxisPosition.BOTTOM
             xAxis.setDrawGridLines(false)
             xAxis.granularity = 1f
+            xAxis.isGranularityEnabled = true
 
             // Configure left Y axis
             val leftAxis = scoresDistributionChart.axisLeft
@@ -341,7 +354,7 @@ class TestStatisticsDetailActivity : AppCompatActivity() {
      */
     private fun updateScoresDistributionChart(scores: List<Double>) {
         try {
-            // Define score ranges
+            // Define score ranges using whole numbers
             val ranges = listOf(
                 "0-59", "60-69", "70-79", "80-89", "90-100"
             )
@@ -363,6 +376,7 @@ class TestStatisticsDetailActivity : AppCompatActivity() {
             // Create entries for the chart
             val entries = ArrayList<BarEntry>()
             for (i in rangeCounts.indices) {
+                // Use whole number index
                 entries.add(BarEntry(i.toFloat(), rangeCounts[i].toFloat()))
             }
 
@@ -385,6 +399,10 @@ class TestStatisticsDetailActivity : AppCompatActivity() {
 
             // Configure X axis labels
             scoresDistributionChart.xAxis.valueFormatter = IndexAxisValueFormatter(ranges)
+
+            // Adjust chart properties to remove half-steps
+            scoresDistributionChart.xAxis.granularity = 1f  // Ensure whole number steps
+            scoresDistributionChart.xAxis.isGranularityEnabled = true
 
             // Set data to chart
             scoresDistributionChart.data = barData

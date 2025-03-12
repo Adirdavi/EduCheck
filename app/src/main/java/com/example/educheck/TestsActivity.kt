@@ -179,17 +179,29 @@ class TestsActivity : AppCompatActivity() {
     }
 
     /**
-     * Return to tabs and refresh the current fragment
+     * חזרה לתצוגת הטאבים ורענון הפרגמנט הנוכחי
+     * עם דגש על רענון רשימת המבחנים
      */
     fun returnToTabsAndRefresh() {
-        // Show ViewPager and hide fragment container
+        // הצג את ViewPager והסתר את מיכל הפרגמנט
         viewPagerContainer.visibility = View.VISIBLE
         fragmentContainer.visibility = View.GONE
 
-        // Refresh the current fragment if it's a TeacherTestsFragment
-        val currentFragment = supportFragmentManager.findFragmentByTag("f" + viewPager.currentItem)
+        // אם זה מורה, ודא שהטאב הראשון (My Tests) נבחר
+        if (isTeacher) {
+            viewPager.currentItem = 0
+        }
+
+        // רענן את הפרגמנט הנוכחי אם זה TeacherTestsFragment
+        val currentFragment = supportFragmentManager.findFragmentByTag("f0")
         if (currentFragment is TeacherTestsFragment) {
             currentFragment.refreshData()
+        } else {
+            // נסה למצוא את הפרגמנט בדרך אחרת
+            val teacherTestsFragment = supportFragmentManager.fragments.find { it is TeacherTestsFragment }
+            if (teacherTestsFragment is TeacherTestsFragment) {
+                teacherTestsFragment.refreshData()
+            }
         }
     }
 
@@ -198,24 +210,28 @@ class TestsActivity : AppCompatActivity() {
      */
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
-        // Check if fragment container is visible
-        if (fragmentContainer.visibility == View.VISIBLE) {
-            // If fragments are in back stack, pop one
-            if (supportFragmentManager.backStackEntryCount > 0) {
-                supportFragmentManager.popBackStack()
+        // בדוק אם מסך העריכה מוצג
+        if (fragmentContainer.visibility == View.VISIBLE && supportFragmentManager.backStackEntryCount > 0) {
+            // במקום לחזור לאקטיביטי הקודמת, חזור לרשימת המבחנים
+            returnToTabsAndRefresh()
 
-                // Return to tabs if no more fragments in back stack
-                if (supportFragmentManager.backStackEntryCount == 0) {
-                    returnToTabs()
-                }
-            } else {
-                // Return to tabs if fragment container is visible
-                returnToTabs()
+            // ודא שהטאב הראשון (My Tests) נבחר
+            if (isTeacher) {
+                viewPager.currentItem = 0  // קבע את האינדקס ל-0 - טאב My Tests
             }
-        } else {
-            // Normal back behavior
-            super.onBackPressed()
+
+            // נקה את כל מחסנית ה-fragments
+            supportFragmentManager.popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE)
+
+            return
+        } else if (fragmentContainer.visibility == View.VISIBLE) {
+            // אם מיכל הפרגמנט גלוי אבל אין פרגמנטים במחסנית, חזור לטאבים
+            returnToTabs()
+            return
         }
+
+        // התנהגות רגילה של כפתור חזור
+        super.onBackPressed()
     }
 
     /**

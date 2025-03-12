@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:padding="16dp"
     android:layoutDirection="ltr"
-    android:background="#FFFFFF">
+    android:background="@color/blue2">
 
     <TextView
         android:id="@+id/dialogTitle"
