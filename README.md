@@ -45,48 +45,8 @@ For example:
 
 ## Installation
 To set up EduCheck locally:
-1. **Clone the repository:**
+ **Clone the repository:**
 ```bash
 git clone https://github.com/Adirdavi/EduCheck.git
 ```
 
-2. **Navigate to the project directory:**
-```bash
-cd EduCheck
-```
-
-3. **Build the project using Gradle:**
-```bash
-./gradlew build
-```
-
-## Usage
-After installation:
-1. **Run the application:**
-```bash
-./gradlew run
-```
-
-2. **Access the user interface** (if applicable) or follow the command-line prompts to upload and grade coding exercises.
-
-## Contributing
-We welcome contributions to enhance EduCheck:
-1. **Fork the repository.**
-2. **Create a new branch** for your feature or bug fix:
-```bash
-git checkout -b feature-name
-```
-
-3. **Implement your changes** and commit them with descriptive messages.
-4. **Push your branch** to your forked repository:
-```bash
-git push origin feature-name
-```
-
-5. **Open a pull request** detailing your changes and the motivation behind them.
-
-## License
-This project is licensed under the MIT License.
-
-## Acknowledgements
-We extend our gratitude to the contributors and the open-source community for their support and collaboration.
