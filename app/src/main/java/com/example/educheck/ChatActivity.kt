@@ -33,6 +33,7 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var messagesContainer: LinearLayout
     private lateinit var messageInput: EditText
     private lateinit var sendButton: ImageButton
+    private lateinit var backButton: ImageButton
 
     private lateinit var firestore: FirebaseFirestore
     private var chatListener: ListenerRegistration? = null
@@ -95,6 +96,13 @@ class ChatActivity : AppCompatActivity() {
         messagesContainer = findViewById(R.id.messagesContainer)
         messageInput = findViewById(R.id.messageInput)
         sendButton = findViewById(R.id.sendButton)
+
+        // Initialize back button
+        backButton = findViewById(R.id.backButton)
+        backButton.setOnClickListener {
+            // Navigate back to StudentMenuActivity
+            finish()
+        }
 
         // Set chat title to other user's name
         chatTitle.text = otherUserName

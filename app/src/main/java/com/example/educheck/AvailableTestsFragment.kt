@@ -10,7 +10,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.educheck.R
 import com.example.educheck.TakeTestActivity
@@ -21,7 +21,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 
 /**
- * Fragment that displays available tests for students
+ * Fragment that displays available tests for students in a grid layout
  */
 class AvailableTestsFragment : Fragment() {
     // List of available tests
@@ -39,6 +39,7 @@ class AvailableTestsFragment : Fragment() {
 
     companion object {
         private const val TAG = "AvailableTestsFragment"
+        private const val SPAN_COUNT = 2 // Number of tests per row
     }
 
     override fun onCreateView(
@@ -82,8 +83,8 @@ class AvailableTestsFragment : Fragment() {
             // Hide the "No tests" message initially
             noTestsMessage.visibility = View.GONE
 
-            // Set up the recycler view
-            testsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+            // Set up the recycler view with GridLayoutManager
+            testsRecyclerView.layoutManager = GridLayoutManager(requireContext(), SPAN_COUNT)
             testsAdapter = TestsAdapter()
             testsRecyclerView.adapter = testsAdapter
 
@@ -174,7 +175,7 @@ class AvailableTestsFragment : Fragment() {
         inner class TestViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             val testNumberText: TextView = itemView.findViewById(R.id.testNumberText)
             val testTitle: TextView = itemView.findViewById(R.id.testTitle)
-            val testDetails: TextView = itemView.findViewById(R.id.testDetails)
+            val totalQuestions: TextView = itemView.findViewById(R.id.totalQuestions)
             val startTestButton: MaterialButton = itemView.findViewById(R.id.startTestButton)
 
             init {
@@ -199,8 +200,11 @@ class AvailableTestsFragment : Fragment() {
             // Set test number
             holder.testNumberText.text = (position + 1).toString()
 
+            // Set test title
             holder.testTitle.text = test.title
-            holder.testDetails.text = "${test.questions.size} questions"
+
+            // Update total questions
+            holder.totalQuestions.text = test.questions.size.toString()
         }
 
         override fun getItemCount() = testsList.size

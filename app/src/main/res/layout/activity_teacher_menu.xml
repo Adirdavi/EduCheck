@@ -9,55 +9,49 @@
     android:layoutDirection="ltr"
     tools:context=".TeacherMenuActivity">
 
-    <!-- Header with back button and title -->
+    <!-- Header with profile and title -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/headerLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="20dp"
-        android:paddingBottom="40dp"
+        android:paddingTop="24dp"
+        android:paddingBottom="24dp"
         android:paddingHorizontal="16dp"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageButton
-            android:id="@+id/backButton"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:contentDescription="Back"
-            android:src="@drawable/ic_logout"
+        <ImageView
+            android:id="@+id/profileIcon"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:background="@drawable/teacher"
+            android:padding="8dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:contentDescription="Profile Icon"/>
 
         <TextView
             android:id="@+id/greetingText"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Hello, [Teacher's Name]!"
-            android:textColor="#FFFFFF"
-            android:textSize="24sp"
+            android:text="Welcome, [Teacher Name]"
+            android:textColor="#000000"
+            android:textSize="45sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/backButton"
-            android:layout_marginTop="16dp" />
+            android:layout_marginStart="16dp"
+            app:layout_constraintStart_toEndOf="@id/profileIcon"
+            app:layout_constraintTop_toTopOf="@id/profileIcon"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
-        <TextView
-            android:id="@+id/subGreetingText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Welcome to the EduQuiz system"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/greetingText"
-            android:layout_marginTop="4dp" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Content area -->
     <ScrollView
+        android:id="@+id/contentScrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="-20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/logoutButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/headerLayout">
@@ -68,34 +62,24 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Topics Section -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:text="Teacher Menu"
-                android:textColor="#212121"
-                android:textSize="24sp"
-                android:textStyle="bold" />
-
             <!-- Grid Layout for Menu Items -->
             <GridLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:columnCount="2"
-                android:useDefaultMargins="true">
+                android:orientation="horizontal"
+                android:useDefaultMargins="false">
 
-                <!-- Tests Card (Combined) -->
+                <!-- Tests Card -->
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardExistingTests"
                     android:layout_width="0dp"
                     android:layout_height="160dp"
                     android:layout_columnWeight="1"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginBottom="16dp"
+                    android:layout_margin="8dp"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp">
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="@color/blue2">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -105,20 +89,19 @@
                         android:padding="16dp">
 
                         <ImageView
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
-                            android:layout_marginBottom="16dp"
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:layout_marginBottom="12dp"
                             android:contentDescription="Tests"
-                            android:padding="15dp"
-                            />
+                            android:padding="10dp"
+                            android:src="@drawable/exam"/>
 
                         <TextView
-                            android:id="@+id/cardTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Tests"
                             android:textAlignment="center"
-                            android:textColor="#212121"
+                            android:textColor="#FFFFFF"
                             android:textSize="16sp"
                             android:textStyle="bold" />
                     </LinearLayout>
@@ -130,11 +113,10 @@
                     android:layout_width="0dp"
                     android:layout_height="160dp"
                     android:layout_columnWeight="1"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginBottom="16dp"
+                    android:layout_margin="8dp"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp">
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="@color/blue2">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -144,19 +126,19 @@
                         android:padding="16dp">
 
                         <ImageView
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
-                            android:layout_marginBottom="16dp"
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:layout_marginBottom="12dp"
                             android:contentDescription="Statistical Analysis"
-                            android:padding="15dp"
-                            />
+                            android:padding="10dp"
+                            android:src="@drawable/exploration"/>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Statistical Analysis"
+                            android:text="Analytics"
                             android:textAlignment="center"
-                            android:textColor="#212121"
+                            android:textColor="#FFFFFF"
                             android:textSize="16sp"
                             android:textStyle="bold" />
                     </LinearLayout>
@@ -168,10 +150,10 @@
                     android:layout_width="0dp"
                     android:layout_height="160dp"
                     android:layout_columnWeight="1"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginBottom="16dp"
+                    android:layout_margin="8dp"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp">
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="@color/blue2">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -181,18 +163,19 @@
                         android:padding="16dp">
 
                         <ImageView
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
-                            android:layout_marginBottom="16dp"
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:layout_marginBottom="12dp"
                             android:contentDescription="Student Tracking"
-                            android:padding="15dp"
-                            />
+                            android:padding="10dp"
+                            android:src="@drawable/student"/>
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Student Tracking"
+                            android:text="Students"
                             android:textAlignment="center"
-                            android:textColor="#212121"
+                            android:textColor="#FFFFFF"
                             android:textSize="16sp"
                             android:textStyle="bold" />
                     </LinearLayout>
@@ -204,10 +187,10 @@
                     android:layout_width="0dp"
                     android:layout_height="160dp"
                     android:layout_columnWeight="1"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginBottom="16dp"
+                    android:layout_margin="8dp"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp">
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="@color/blue2">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -219,14 +202,14 @@
                         <FrameLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="16dp">
+                            android:layout_marginBottom="12dp">
 
                             <ImageView
-                                android:layout_width="70dp"
-                                android:layout_height="70dp"
+                                android:layout_width="80dp"
+                                android:layout_height="80dp"
                                 android:contentDescription="Student Chat"
-                                android:padding="15dp"
-                                />
+                                android:padding="10dp"
+                                android:src="@drawable/chat"/>
 
                             <!-- Notification badge -->
                             <TextView
@@ -246,9 +229,9 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Chat with Students"
+                            android:text="Messages"
                             android:textAlignment="center"
-                            android:textColor="#212121"
+                            android:textColor="#FFFFFF"
                             android:textSize="16sp"
                             android:textStyle="bold" />
                     </LinearLayout>
@@ -260,10 +243,10 @@
                     android:layout_width="0dp"
                     android:layout_height="160dp"
                     android:layout_columnWeight="1"
-                    android:layout_columnSpan="2"
-                    android:layout_marginBottom="16dp"
+                    android:layout_margin="8dp"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp">
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="@color/blue2">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -273,40 +256,44 @@
                         android:padding="16dp">
 
                         <ImageView
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
-                            android:layout_marginBottom="16dp"
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:layout_marginBottom="12dp"
                             android:contentDescription="Error Reporting"
-                            android:padding="15dp"
-                            />
+                            android:padding="10dp"
+                            android:src="@drawable/message_report"/>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Error Reporting"
+                            android:text="Reports"
                             android:textAlignment="center"
-                            android:textColor="#212121"
+                            android:textColor="#FFFFFF"
                             android:textSize="16sp"
                             android:textStyle="bold" />
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
             </GridLayout>
-
-            <!-- Logout Button -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/logoutButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp"
-                android:paddingVertical="12dp"
-                android:text="Log out"
-                android:textAllCaps="false"
-                android:textColor="#FFFFFF"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                app:cornerRadius="16dp"
-                app:backgroundTint="#FF4444" />
         </LinearLayout>
     </ScrollView>
+
+    <!-- Logout Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/logoutButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="16dp"
+        android:paddingVertical="12dp"
+        android:text="Log Out"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:cornerRadius="16dp"
+        app:backgroundTint="#FF4444"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

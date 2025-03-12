@@ -6,9 +6,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -17,11 +19,13 @@ import com.example.educheck.TakeTestActivity
 import com.example.educheck.utilities.Test
 import com.example.educheck.utilities.TestResult
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.math.roundToInt
 
 /**
  * Fragment that displays tests that the student has already completed
@@ -131,6 +135,13 @@ class CompletedTestsFragment : Fragment() {
                                 val result = document.toObject(TestResult::class.java)
                                 // Store document ID for later use
                                 result.documentId = document.id
+
+                                // Make sure we have the total questions count for the UI
+                                if (result.totalQuestions <= 0) {
+                                    // If total questions is not available, fetch it from the test document
+                                    fetchTestDetails(result)
+                                }
+
                                 result
                             } catch (e: Exception) {
                                 Log.e(TAG, "Error converting document to test result: ${e.message}")
@@ -175,30 +186,41 @@ class CompletedTestsFragment : Fragment() {
     }
 
     /**
-     * Get test title dynamically
+     * Fetch additional test details if needed
      */
-    private fun getTestTitle(result: TestResult): String {
-        // Check if there's a test title in the result
-        if (result.testTitle.isNotEmpty()) {
-            return result.testTitle
-        }
-
-        // If there's no title in the model, try to get it from Firebase
+    private fun fetchTestDetails(result: TestResult) {
         if (result.testId.isNotEmpty()) {
             firestore.collection("tests").document(result.testId)
                 .get()
                 .addOnSuccessListener { documentSnapshot ->
                     if (documentSnapshot.exists()) {
-                        val title = documentSnapshot.getString("title") ?: "Test"
+                        try {
+                            // Get test title if missing
+                            if (result.testTitle.isEmpty()) {
+                                val title = documentSnapshot.getString("title") ?: "Test"
+                                result.testTitle = title
+                            }
 
-                        // Update the view
-                        testsAdapter.notifyDataSetChanged()
+                            // Get total questions count if missing
+                            if (result.totalQuestions <= 0) {
+                                val test = documentSnapshot.toObject(Test::class.java)
+                                if (test != null) {
+                                    result.totalQuestions = test.questions.size
+                                    Log.d(TAG, "Updated total questions for test ${result.testId}: ${result.totalQuestions}")
+                                }
+                            }
+
+                            // Notify adapter of changes
+                            testsAdapter.notifyDataSetChanged()
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Error fetching test details: ${e.message}")
+                        }
                     }
                 }
+                .addOnFailureListener { e ->
+                    Log.e(TAG, "Error fetching test: ${e.message}")
+                }
         }
-
-        // Return default
-        return "Test"
     }
 
     /**
@@ -245,15 +267,31 @@ class CompletedTestsFragment : Fragment() {
     }
 
     /**
-     * Adapter for the recycler view of completed tests
+     * Adapter for the recycler view of completed tests with enhanced UI
      */
     inner class CompletedTestsAdapter : RecyclerView.Adapter<CompletedTestsAdapter.TestViewHolder>() {
 
         inner class TestViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            // Card and basic info
             val testCard: MaterialCardView = itemView.findViewById(R.id.testCard)
             val testTitle: TextView = itemView.findViewById(R.id.testTitle)
-            val testScore: TextView = itemView.findViewById(R.id.testScore)
             val testDate: TextView = itemView.findViewById(R.id.testDate)
+
+            // Progress circle and score
+            val scoreProgress: CircularProgressIndicator = itemView.findViewById(R.id.scoreProgress)
+            val testScore: TextView = itemView.findViewById(R.id.testScore)
+            val scoreDescription: TextView = itemView.findViewById(R.id.scoreDescription)
+
+            // Question counters
+            val correctAnswers: TextView = itemView.findViewById(R.id.correctAnswers)
+            val totalQuestions: TextView = itemView.findViewById(R.id.totalQuestions)
+
+            // Optional course label
+            val courseLabel: TextView? = itemView.findViewById(R.id.courseLabel)
+
+            // Icons for correct/total questions cards (might be null if not in layout)
+            val correctIcon: ImageView? = itemView.findViewWithTag("correctIcon")
+            val questionsIcon: ImageView? = itemView.findViewWithTag("questionsIcon")
 
             init {
                 // Set up click listener for the card
@@ -275,25 +313,71 @@ class CompletedTestsFragment : Fragment() {
         override fun onBindViewHolder(holder: TestViewHolder, position: Int) {
             val result = testResultsList[position]
 
-            // Show test title (if there's a title use it, otherwise try to get it)
+            // Show test title
             holder.testTitle.text = if (result.testTitle.isNotEmpty()) {
                 result.testTitle
             } else {
-                getTestTitle(result)
+                "Test ${position + 1}"
             }
 
-            // Set the score
-            val score = String.format("%.1f", result.score)
-            holder.testScore.text = "Score: $score"
+            // Set the score (now Double type)
+            val scoreValue = result.score
+            holder.testScore.text = String.format("%.1f", scoreValue)
 
-            // Score color based on value
-            val textColor = when {
-                result.score >= 90 -> requireContext().getColor(R.color.colorGreen)
-                result.score >= 70 -> requireContext().getColor(R.color.colorLightGreen)
-                result.score >= 60 -> requireContext().getColor(R.color.colorOrange)
-                else -> requireContext().getColor(R.color.colorRed)
+            // Set the progress indicator to match the score
+            holder.scoreProgress.progress = scoreValue.toInt()
+
+            // Set score color and description based on value
+            val (textColor, description) = when {
+                scoreValue >= 90 -> Pair(
+                    ContextCompat.getColor(requireContext(), R.color.colorGreen),
+                    "Excellent!"
+                )
+                scoreValue >= 80 -> Pair(
+                    ContextCompat.getColor(requireContext(), R.color.colorLightGreen),
+                    "Very Good!"
+                )
+                scoreValue >= 70 -> Pair(
+                    ContextCompat.getColor(requireContext(), R.color.colorLightGreen),
+                    "Good"
+                )
+                scoreValue >= 60 -> Pair(
+                    ContextCompat.getColor(requireContext(), R.color.colorOrange),
+                    "Satisfactory"
+                )
+                else -> Pair(
+                    ContextCompat.getColor(requireContext(), R.color.colorRed),
+                    "Needs Improvement"
+                )
             }
+
+            // Apply colors to UI elements
             holder.testScore.setTextColor(textColor)
+            holder.scoreProgress.setIndicatorColor(textColor)
+            holder.scoreDescription.text = description
+
+            // Set correct answers and total questions counts
+            val totalQuestionsCount = result.totalQuestions
+
+            if (totalQuestionsCount > 0) {
+                // Calculate correct answers based on score percentage
+                val correctAnswersCount = ((scoreValue * totalQuestionsCount) / 100.0).roundToInt()
+
+                holder.correctAnswers.text = correctAnswersCount.toString()
+                holder.totalQuestions.text = totalQuestionsCount.toString()
+
+                // Set colors for the icons if they exist
+                holder.correctIcon?.setColorFilter(
+                    ContextCompat.getColor(requireContext(), R.color.colorGreen)
+                )
+                holder.questionsIcon?.setColorFilter(
+                    ContextCompat.getColor(requireContext(), R.color.colorBlue)
+                )
+            } else {
+                // If total questions is not available yet
+                holder.correctAnswers.text = "-"
+                holder.totalQuestions.text = "-"
+            }
 
             // Set test date
             try {

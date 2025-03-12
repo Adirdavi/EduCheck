@@ -103,7 +103,6 @@ class StudentMenuActivity : AppCompatActivity() {
         appLogo = findViewById(R.id.appLogo)
         greetingText = findViewById(R.id.greetingText)
         subGreetingText = findViewById(R.id.subGreetingText)
-        averageScore = findViewById(R.id.averageScore)
         messageBadge = findViewById(R.id.requestsBadge)
 
         cardAvailableTests = findViewById(R.id.cardAvailableTests)

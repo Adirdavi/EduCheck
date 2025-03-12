@@ -1,10 +1,10 @@
 package com.example.educheck
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ImageButton
-import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -22,21 +22,19 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.auth.FirebaseAuth
 
 /**
- * Activity that displays tests - for both students and teachers.
- * Students can take tests, teachers can view tests.
- * Uses fragments to separate different test views.
+ * Activity that displays tests for both students and teachers.
+ * Provides different views and interactions based on user role.
  */
 class TestsActivity : AppCompatActivity() {
 
     // UI component references
     private lateinit var viewPager: ViewPager2
     private lateinit var tabLayout: TabLayout
-    private lateinit var titleTextView: TextView
     private lateinit var backButton: ImageButton
     private lateinit var viewPagerContainer: View
     private lateinit var fragmentContainer: View
 
-    // User role
+    // User role and identification
     var isTeacher = false
     private var userId = ""
 
@@ -47,88 +45,103 @@ class TestsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Enable edge-to-edge support
+        // Enable full-screen edge-to-edge display
         enableEdgeToEdge()
 
-        // Load the layout file for the screen
+        // Set the layout for the activity
         setContentView(R.layout.activity_tests)
 
-        // Initialize Firebase Auth
+        // Initialize Firebase Authentication
         val auth = FirebaseAuth.getInstance()
 
-        // Get current user ID
+        // Retrieve current user ID
         userId = auth.currentUser?.uid ?: ""
         if (userId.isEmpty()) {
+            // Finish activity if no user is logged in
             finish()
             return
         }
 
-        // Determine if the user is a teacher
+        // Check if the user is a teacher from the intent
         isTeacher = intent.getBooleanExtra("IS_TEACHER", false)
-        Log.d(TAG, "IS_TEACHER flag from intent: $isTeacher")
+        Log.d(TAG, "User is teacher: $isTeacher")
 
-        // Set listener for system insets updates
+        // Set up system bars insets
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        // Initialize UI components
+        // Initialize user interface components
         initializeUI()
 
-        // Setup ViewPager with appropriate fragments
+        // Configure ViewPager with appropriate fragments
         setupViewPager()
     }
 
     /**
-     * Initialize UI components
+     * Initialize all UI components and set up listeners
      */
     private fun initializeUI() {
+        // Find views by their IDs
         viewPager = findViewById(R.id.viewPager)
         tabLayout = findViewById(R.id.tabLayout)
-        titleTextView = findViewById(R.id.titleTextView)
         backButton = findViewById(R.id.backButton)
 
-        // Find the containers
+        // Find container views
         viewPagerContainer = findViewById(R.id.viewPagerContainer)
         fragmentContainer = findViewById(R.id.fragmentContainer)
 
-        // Set the appropriate title based on user role
-        titleTextView.text = if (isTeacher) "Manage Tests" else "Tests"
-
-        // Set back button click listener
+        // Set up back button to navigate to appropriate menu
         backButton.setOnClickListener {
-            onBackPressed()
+            navigateToAppropriateMenu()
         }
     }
 
     /**
-     * Setup ViewPager with appropriate fragments
+     * Navigate to the correct menu based on user role
+     */
+    private fun navigateToAppropriateMenu() {
+        // Choose the correct menu activity based on user role
+        val intent = if (isTeacher) {
+            Intent(this, TeacherMenuActivity::class.java)
+        } else {
+            Intent(this, StudentMenuActivity::class.java)
+        }
+
+        // Clear the activity stack and start the menu activity
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        startActivity(intent)
+        finish()
+    }
+
+    /**
+     * Set up ViewPager with fragments based on user role
      */
     private fun setupViewPager() {
-        // Create appropriate pager adapter based on user role
+        // Create the appropriate pager adapter
         val pagerAdapter = if (isTeacher) {
             TeacherTestsPagerAdapter(this)
         } else {
             StudentTestsPagerAdapter(this)
         }
 
-        // Set adapter to ViewPager2
+        // Set the adapter for ViewPager2
         viewPager.adapter = pagerAdapter
 
         // Connect TabLayout with ViewPager2
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = if (isTeacher) {
                 when (position) {
-                    0 -> "המבחנים שלי"
-                    1 -> "יצירת מבחן חדש"
+                    0 -> "My Tests"
+                    1 -> "Create New Test"
                     else -> "Tab ${position + 1}"
                 }
             } else {
                 when (position) {
-                    0 -> "מבחנים זמינים"
-                    1 -> "מבחנים שפתרתי"
+                    0 -> "Available Tests"
+                    1 -> "Completed Tests"
                     else -> "Tab ${position + 1}"
                 }
             }
@@ -136,18 +149,18 @@ class TestsActivity : AppCompatActivity() {
     }
 
     /**
-     * Function to navigate to a specific fragment, replacing the current view
+     * Navigate to a specific fragment, replacing the current view
      */
     fun navigateToFragment(fragment: Fragment, addToBackStack: Boolean = true) {
-        // Hide the ViewPager container and show the fragment container
+        // Hide ViewPager and show fragment container
         viewPagerContainer.visibility = View.GONE
         fragmentContainer.visibility = View.VISIBLE
 
-        // Create a transaction to replace the fragment
+        // Begin fragment transaction
         val transaction = supportFragmentManager.beginTransaction()
             .replace(R.id.fragmentContainer, fragment)
 
-        // Add to back stack if needed
+        // Add to back stack if required
         if (addToBackStack) {
             transaction.addToBackStack(null)
         }
@@ -157,29 +170,23 @@ class TestsActivity : AppCompatActivity() {
     }
 
     /**
-     * Function to return to the tabs view
+     * Return to the tabs view
      */
     fun returnToTabs() {
-        // Show the ViewPager container and hide the fragment container
+        // Show ViewPager and hide fragment container
         viewPagerContainer.visibility = View.VISIBLE
         fragmentContainer.visibility = View.GONE
-
-        // Reset the title
-        titleTextView.text = if (isTeacher) "Manage Tests" else "Tests"
     }
 
     /**
-     * נקרא כאשר חוזרים לתצוגת הלשוניות, מרענן את הפרגמנט הנוכחי
+     * Return to tabs and refresh the current fragment
      */
     fun returnToTabsAndRefresh() {
-        // הצגת ViewPager והסתרת מיכל הפרגמנט
+        // Show ViewPager and hide fragment container
         viewPagerContainer.visibility = View.VISIBLE
         fragmentContainer.visibility = View.GONE
 
-        // איפוס הכותרת
-        titleTextView.text = if (isTeacher) "Manage Tests" else "Tests"
-
-        // רענון הפרגמנט הנוכחי
+        // Refresh the current fragment if it's a TeacherTestsFragment
         val currentFragment = supportFragmentManager.findFragmentByTag("f" + viewPager.currentItem)
         if (currentFragment is TeacherTestsFragment) {
             currentFragment.refreshData()
@@ -187,24 +194,22 @@ class TestsActivity : AppCompatActivity() {
     }
 
     /**
-     * Override for onBackPressed to handle fragment navigation
+     * Handle back button press
      */
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
-        // Check if the fragment container is visible
+        // Check if fragment container is visible
         if (fragmentContainer.visibility == View.VISIBLE) {
-            // If we have fragments in the back stack, pop one
+            // If fragments are in back stack, pop one
             if (supportFragmentManager.backStackEntryCount > 0) {
                 supportFragmentManager.popBackStack()
 
-                // If we no longer have fragments in the back stack after popping,
-                // return to the tabs view
+                // Return to tabs if no more fragments in back stack
                 if (supportFragmentManager.backStackEntryCount == 0) {
                     returnToTabs()
                 }
             } else {
-                // If no fragments in back stack but fragment container is visible,
-                // return to the tabs view
+                // Return to tabs if fragment container is visible
                 returnToTabs()
             }
         } else {

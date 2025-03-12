@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background"
-    android:layoutDirection="ltr"
+    android:layoutDirection="rtl"
     tools:context=".TestsActivity">
 
     <!-- Header with title -->
@@ -15,7 +15,6 @@
         android:id="@+id/headerLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#FFFFFF"
         android:elevation="4dp"
         android:padding="16dp"
         app:layout_constraintTop_toTopOf="parent">
@@ -30,22 +29,9 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/titleTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tests"
-            android:textColor="#212121"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- מיכל ל-Tabs + ViewPager -->
+    <!-- Rest of the layout remains the same -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/viewPagerContainer"
         android:layout_width="match_parent"
@@ -56,19 +42,23 @@
         app:layout_constraintTop_toBottomOf="@+id/headerLayout">
 
         <!-- Tab Layout -->
+
+        <!-- ViewPager for Fragments -->
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFFFFF"
-            app:tabTextColor="#757575"
-            app:tabSelectedTextColor="#5BACE1"
-            app:tabIndicatorColor="#5BACE1"
-            app:tabMode="fixed"
+            android:background="@android:color/transparent"
+            app:layout_constraintTop_toTopOf="parent"
             app:tabGravity="fill"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:tabMode="fixed"
+            app:tabTextColor="@color/blue2"
+            app:tabBackground="@color/white"
+            app:tabSelectedTextColor="#000000"
+            app:tabIndicatorColor="#000000"
+            app:tabTextAppearance="@style/CustomTabTextAppearance"
+            tools:layout_editor_absoluteX="0dp" />
 
-        <!-- ViewPager for Fragments -->
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/viewPager"
             android:layout_width="match_parent"
@@ -78,7 +68,7 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- מיכל נפרד לפרגמנטים דינמיים -->
+    <!-- Fragment Container -->
     <FrameLayout
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"

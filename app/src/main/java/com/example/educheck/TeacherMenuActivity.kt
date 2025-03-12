@@ -122,10 +122,7 @@ class TeacherMenuActivity : AppCompatActivity(), View.OnClickListener {
             logoutButton = findViewById(R.id.logoutButton)
 
             // עדכון הטקסט של כרטיס המבחנים המאוחד
-            val testsCardText = cardTests.findViewById<TextView>(R.id.cardTitle)
-            if (testsCardText != null) {
-                testsCardText.text = "Tests"
-            }
+
         } catch (e: Exception) {
             Log.e(TAG, "Error initializing UI components: ${e.message}")
         }
