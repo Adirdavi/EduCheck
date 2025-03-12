@@ -1,10 +1,12 @@
 # EduCheck
-<!-- הוסף את הלוגו שלך כאן -
+
+<!-- הוסף את הלוגו שלך כאן -->
+<!-- ![EduCheck Logo](path/to/your/logo.png) -->
+
 ## 📑 Overview
 EduCheck is an advanced auto-grading and educational management tool designed to streamline the evaluation process for both educators and students. It automates test creation, grading, and feedback, providing immediate insights while reducing manual workload for teachers.
 
 ## ✨ Key Features
-
 
 ### 📝 Automated Grading
 * Instantly assesses assignments and tests based on predefined criteria
@@ -72,59 +74,3 @@ To set up EduCheck locally:
 1. **Clone the repository:**
 ```bash
 git clone https://github.com/Adirdavi/EduCheck.git
-```
-
-2. **Navigate to the project directory:**
-```bash
-cd EduCheck
-```
-
-3. **Build the project using Gradle:**
-```bash
-./gradlew build
-```
-
-4. **Set up Firebase:**
-   * Create a Firebase project in the Firebase Console
-   * Add an Android app to your Firebase project
-   * Download the `google-services.json` file and place it in the app directory
-   * Enable Firebase Authentication and Realtime Database services
-
-## 📲 Usage
-
-After installation:
-
-1. **Run the application:**
-```bash
-./gradlew run
-```
-
-2. **Register as a teacher or student**
-3. **Teachers**: Create tests, manage classes, and analyze results
-4. **Students**: Take tests, view feedback, and track progress
-
-## 🤝 Contributing
-
-We welcome contributions to enhance EduCheck:
-
-1. **Fork the repository**
-2. **Create a new branch** for your feature or bug fix:
-```bash
-git checkout -b feature-name
-```
-
-3. **Implement your changes** and commit them with descriptive messages
-4. **Push your branch** to your forked repository:
-```bash
-git push origin feature-name
-```
-
-5. **Open a pull request** detailing your changes and the motivation behind them
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
-## 👏 Acknowledgements
-
-We extend our gratitude to the contributors and the open-source community for their support and collaboration.
