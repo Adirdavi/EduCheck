@@ -231,6 +231,7 @@ class QuestionReportsActivity : AppCompatActivity() {
             val reportDate: TextView = itemView.findViewById(R.id.reportDate)
             val statusIndicator: View = itemView.findViewById(R.id.statusIndicator)
             val markResolvedButton: MaterialButton = itemView.findViewById(R.id.markResolvedButton)
+            val studentReportContent: TextView = itemView.findViewById(R.id.studentReportContent)
 
             init {
                 // אין מאזין לחיצה על הכרטיס - רק על הכפתור
@@ -269,7 +270,9 @@ class QuestionReportsActivity : AppCompatActivity() {
             }
             holder.questionPreview.text = questionText
 
-            // Set student name
+            // Set student report content
+            holder.studentReportContent.text = report.reportText
+            holder.studentReportContent.visibility = if (report.reportText.isNotEmpty()) View.VISIBLE else View.GONE
 
             // Set report date
             try {
