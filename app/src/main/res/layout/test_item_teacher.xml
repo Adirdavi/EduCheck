@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:background="@color/blue2">
+        android:background="#99C0E9">
 
         <!-- Test number in circle -->
         <androidx.cardview.widget.CardView

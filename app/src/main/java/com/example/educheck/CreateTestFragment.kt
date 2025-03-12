@@ -16,6 +16,8 @@ import com.example.educheck.TestsActivity
 import com.example.educheck.utilities.Question
 import com.example.educheck.utilities.Test
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.chip.Chip
+import com.google.android.material.divider.MaterialDivider
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -691,11 +693,12 @@ class CreateTestFragment : Fragment() {
         inner class QuestionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             val questionNumber: TextView = itemView.findViewById(R.id.questionNumber)
             val questionText: TextView = itemView.findViewById(R.id.questionText)
-            val questionOptions: TextView = itemView.findViewById(R.id.questionOptions)
-            val deleteButton: ImageButton = itemView.findViewById(R.id.deleteQuestionButton)
+            val correctAnswerText: TextView = itemView.findViewById(R.id.correctAnswerText)
+            val deleteButton: MaterialButton = itemView.findViewById(R.id.deleteQuestionButton)
+            val editButton: MaterialButton = itemView.findViewById(R.id.editQuestionButton)
 
             init {
-                // Set click listener for editing a question
+                // Set click listener for editing a question (from anywhere on the card)
                 itemView.setOnClickListener {
                     val position = adapterPosition
                     if (position != RecyclerView.NO_POSITION) {
@@ -704,8 +707,16 @@ class CreateTestFragment : Fragment() {
                     }
                 }
 
+                // Set click listener for the Edit button
+                editButton.setOnClickListener {
+                    val position = adapterPosition
+                    if (position != RecyclerView.NO_POSITION) {
+                        Log.d(TAG, "Edit button clicked at position $position")
+                        openEditQuestionDialog(questionsList[position], position)
+                    }
+                }
+
                 // Set click listener for deleting a question
-                // This now uses the new deleteQuestionAndUpdateFirebase method
                 deleteButton.setOnClickListener {
                     val position = adapterPosition
                     if (position != RecyclerView.NO_POSITION) {
@@ -717,7 +728,7 @@ class CreateTestFragment : Fragment() {
                                 .setTitle("Delete Question")
                                 .setMessage("Are you sure you want to delete this question?")
                                 .setPositiveButton("Delete") { _, _ ->
-                                    // Use the new method that updates Firebase immediately
+                                    // Use the method that updates Firebase immediately
                                     deleteQuestionAndUpdateFirebase(position)
                                 }
                                 .setNegativeButton("Cancel", null)
@@ -747,8 +758,7 @@ class CreateTestFragment : Fragment() {
             // Display question text
             holder.questionText.text = question.text
 
-            // Display info about answer options
-            val validOptions = question.options.count { it.isNotEmpty() }
+            // Display correct answer letter
             val correctOptionLetter = when(question.correctOptionIndex) {
                 0 -> "A"
                 1 -> "B"
@@ -756,7 +766,7 @@ class CreateTestFragment : Fragment() {
                 3 -> "D"
                 else -> "Not selected"
             }
-            holder.questionOptions.text = "$validOptions options | Correct answer: $correctOptionLetter"
+            holder.correctAnswerText.text = "Correct answer: $correctOptionLetter"
         }
 
         override fun getItemCount() = questionsList.size

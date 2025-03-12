@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -18,6 +19,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.firestore.FirebaseFirestore
 
 /**
  * Activity for student to select a teacher to chat with
@@ -30,8 +32,10 @@ class TeacherSelectionActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var database: FirebaseDatabase
+    private lateinit var firestore: FirebaseFirestore
 
     private val teachersList = ArrayList<Teacher>()
+    private val unreadMessagesMap = HashMap<String, Int>()
     private var studentId: String = ""
     private var studentName: String = ""
 
@@ -46,6 +50,7 @@ class TeacherSelectionActivity : AppCompatActivity() {
         // Initialize Firebase
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance()
+        firestore = FirebaseFirestore.getInstance()
 
         // Get student details
         studentId = auth.currentUser?.uid ?: ""
@@ -60,18 +65,30 @@ class TeacherSelectionActivity : AppCompatActivity() {
         emptyView = findViewById(R.id.emptyView)
 
         // Set up adapter
-        teachersAdapter = TeachersAdapter(teachersList) { teacher ->
+        teachersAdapter = TeachersAdapter(teachersList, unreadMessagesMap) { teacher ->
             openChatWithTeacher(teacher)
         }
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = teachersAdapter
 
+        val backButton = findViewById<ImageButton>(R.id.backButton)
+        backButton.setOnClickListener {
+            // פעולת חזרה
+            onBackPressed()
+        }
+
         // Get student name
         getStudentName()
 
         // Load teachers list
         loadTeachers()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Check for unread messages when returning to this screen
+        checkForUnreadMessages()
     }
 
     /**
@@ -109,15 +126,14 @@ class TeacherSelectionActivity : AppCompatActivity() {
                         val teacherId = teacherSnapshot.key ?: continue
                         val firstName = teacherSnapshot.child("firstName").getValue(String::class.java) ?: ""
                         val lastName = teacherSnapshot.child("lastName").getValue(String::class.java) ?: ""
-                        val subject = teacherSnapshot.child("subject").getValue(String::class.java) ?: ""
 
                         val teacherName = "$firstName $lastName"
-                        teachersList.add(Teacher(teacherId, teacherName, subject))
+                        teachersList.add(Teacher(teacherId, teacherName, ""))
                     }
                 }
 
-                // Update UI
-                updateUI()
+                // Check for unread messages
+                checkForUnreadMessages()
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -126,6 +142,55 @@ class TeacherSelectionActivity : AppCompatActivity() {
                     "Error loading teachers list", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+    /**
+     * Check for unread messages from each teacher
+     */
+    private fun checkForUnreadMessages() {
+        try {
+            unreadMessagesMap.clear()
+
+            firestore.collection("chats")
+                .whereArrayContains("participants", studentId)
+                .get()
+                .addOnSuccessListener { snapshot ->
+                    if (!snapshot.isEmpty) {
+                        for (document in snapshot.documents) {
+                            try {
+                                @Suppress("UNCHECKED_CAST")
+                                val messages = document.get("messages") as? ArrayList<HashMap<String, Any>> ?: ArrayList()
+
+                                // Group unread messages by sender
+                                for (message in messages) {
+                                    val receiverId = message["receiverId"] as? String ?: ""
+                                    val senderId = message["senderId"] as? String ?: ""
+                                    val isRead = message["isRead"] as? Boolean ?: true
+
+                                    // If the message was sent to the student and is unread
+                                    if (receiverId == studentId && !isRead) {
+                                        // Increment unread count for this teacher
+                                        val currentCount = unreadMessagesMap[senderId] ?: 0
+                                        unreadMessagesMap[senderId] = currentCount + 1
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Error processing chat document: ${e.message}")
+                            }
+                        }
+                    }
+
+                    // Update UI
+                    updateUI()
+                }
+                .addOnFailureListener { e ->
+                    Log.e(TAG, "Error checking for unread messages: ${e.message}")
+                    updateUI()
+                }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in checkForUnreadMessages: ${e.message}")
+            updateUI()
+        }
     }
 
     /**
@@ -168,13 +233,14 @@ class TeacherSelectionActivity : AppCompatActivity() {
      */
     inner class TeachersAdapter(
         private val teachers: List<Teacher>,
+        private val unreadMessagesMap: HashMap<String, Int>,
         private val onItemClick: (Teacher) -> Unit
     ) : RecyclerView.Adapter<TeachersAdapter.TeacherViewHolder>() {
 
         inner class TeacherViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             val cardView: CardView = itemView.findViewById(R.id.teacherCard)
             val nameTextView: TextView = itemView.findViewById(R.id.teacherName)
-            val subjectTextView: TextView = itemView.findViewById(R.id.teacherSubject)
+            val unreadBadge: TextView = itemView.findViewById(R.id.unreadBadge)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TeacherViewHolder {
@@ -188,12 +254,13 @@ class TeacherSelectionActivity : AppCompatActivity() {
 
             holder.nameTextView.text = teacher.name
 
-            // Show subject if available
-            if (teacher.subject.isNotEmpty()) {
-                holder.subjectTextView.text = teacher.subject
-                holder.subjectTextView.visibility = View.VISIBLE
+            // Show unread message badge if there are unread messages
+            val unreadCount = unreadMessagesMap[teacher.id] ?: 0
+            if (unreadCount > 0) {
+                holder.unreadBadge.visibility = View.VISIBLE
+                holder.unreadBadge.text = if (unreadCount > 9) "9+" else unreadCount.toString()
             } else {
-                holder.subjectTextView.visibility = View.GONE
+                holder.unreadBadge.visibility = View.GONE
             }
 
             // Set click listener

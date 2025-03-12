@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -96,6 +97,12 @@ class TestStatisticsActivity : AppCompatActivity() {
             testsRecyclerView.layoutManager = LinearLayoutManager(this)
             testsRecyclerView.adapter = testsAdapter
 
+            val backButton: ImageButton = findViewById(R.id.backButton)
+            backButton.setOnClickListener {
+                // חזרה למסך הקודם
+                onBackPressed()
+            }
+
         } catch (e: Exception) {
             Log.e(TAG, "Error initializing UI: ${e.message}")
             Toast.makeText(this, "Error initializing UI: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -185,6 +192,9 @@ class TestStatisticsActivity : AppCompatActivity() {
         // Counter for completed async operations
         var completedQueries = 0
 
+        // Temporary map to store participation counts before filtering
+        val tempParticipationMap = mutableMapOf<String, Int>()
+
         // For each test, get the number of student submissions
         testsList.forEach { test ->
             firestore.collection("test_results")
@@ -192,15 +202,25 @@ class TestStatisticsActivity : AppCompatActivity() {
                 .get()
                 .addOnSuccessListener { resultsDocuments ->
                     // Save the count of submissions for this test
-                    testsParticipationMap[test.id] = resultsDocuments.size()
+                    tempParticipationMap[test.id] = resultsDocuments.size()
 
                     // Increment counter
                     completedQueries++
 
-                    // If all queries are done, update the UI
+                    // If all queries are done, filter and update the UI
                     if (completedQueries == testsList.size) {
+                        // Filter out tests with no submissions
+                        filterTestsWithNoSubmissions(tempParticipationMap)
+
                         progressIndicator.visibility = View.GONE
-                        testsAdapter.notifyDataSetChanged()
+
+                        // Check if there are any tests left after filtering
+                        if (testsList.isEmpty()) {
+                            noTestsMessage.visibility = View.VISIBLE
+                            noTestsMessage.text = "No tests with student submissions available"
+                        } else {
+                            testsAdapter.notifyDataSetChanged()
+                        }
                     }
                 }
                 .addOnFailureListener { e ->
@@ -209,13 +229,48 @@ class TestStatisticsActivity : AppCompatActivity() {
                     // Still increment counter to avoid deadlock
                     completedQueries++
 
-                    // If all queries are done, update the UI
+                    // If all queries are done, filter and update the UI
                     if (completedQueries == testsList.size) {
+                        // Filter out tests with no submissions
+                        filterTestsWithNoSubmissions(tempParticipationMap)
+
                         progressIndicator.visibility = View.GONE
-                        testsAdapter.notifyDataSetChanged()
+
+                        // Check if there are any tests left after filtering
+                        if (testsList.isEmpty()) {
+                            noTestsMessage.visibility = View.VISIBLE
+                            noTestsMessage.text = "No tests with student submissions available"
+                        } else {
+                            testsAdapter.notifyDataSetChanged()
+                        }
                     }
                 }
         }
+    }
+
+    /**
+     * Filter out tests with no submissions
+     */
+    private fun filterTestsWithNoSubmissions(participationMap: Map<String, Int>) {
+        // Keep only tests with at least one submission
+        val testsWithSubmissions = testsList.filter { test ->
+            val submissionCount = participationMap[test.id] ?: 0
+            submissionCount > 0
+        }
+
+        // Clear the current list and add only tests with submissions
+        testsList.clear()
+        testsList.addAll(testsWithSubmissions)
+
+        // Update the participation map with only tests that have submissions
+        testsParticipationMap.clear()
+        participationMap.forEach { (testId, count) ->
+            if (count > 0) {
+                testsParticipationMap[testId] = count
+            }
+        }
+
+        Log.d(TAG, "Filtered to ${testsList.size} tests with submissions")
     }
 
     /**

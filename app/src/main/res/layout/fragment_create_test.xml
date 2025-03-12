@@ -50,13 +50,19 @@
         android:layout_margin="16dp"
         app:cardCornerRadius="8dp"
         app:cardElevation="4dp"
+        app:cardBackgroundColor="#1565C0"
+        android:backgroundTint="#1565C0"
+        android:background="#1565C0"
+        app:strokeWidth="0dp"
+        style="@style/Widget.MaterialComponents.CardView"
         app:layout_constraintTop_toBottomOf="@id/headerLayout">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="16dp"
+            android:background="#1565C0">
 
             <TextView
                 android:layout_width="match_parent"
@@ -64,6 +70,7 @@
                 android:text="Add New Question"
                 android:textSize="18sp"
                 android:textStyle="bold"
+                android:textColor="@android:color/white"
                 android:textAlignment="center" />
 
             <com.google.android.material.button.MaterialButton
@@ -71,7 +78,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Add Question"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"
+                app:backgroundTint="@android:color/white"
+                android:backgroundTint="@android:color/white"
+                android:textColor="#1565C0"
+                style="@style/Widget.MaterialComponents.Button" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
@@ -96,7 +107,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Save Test"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:backgroundTint="#1565C0"
+            />
     </LinearLayout>
 
     <!-- Loading indicator -->

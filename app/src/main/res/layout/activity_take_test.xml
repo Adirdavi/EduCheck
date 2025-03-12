@@ -8,113 +8,184 @@
     android:layout_height="match_parent"
     android:background="@drawable/background"
     android:layoutDirection="ltr"
-
     tools:context=".TakeTestActivity">
 
-    <LinearLayout
+    <!-- Modernized header with improved styling -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/headerLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="#FFFFFF"
-        android:padding="16dp"
+        android:paddingTop="24dp"
+        android:paddingBottom="16dp"
+        android:paddingHorizontal="16dp"
+        android:background="@color/blue2"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/testTitleTextView"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Test Title"
-            android:textSize="24sp"
+            android:textSize="30sp"
             android:textStyle="bold"
-            android:textAlignment="center"
-            android:textColor="#333333" />
+            android:textColor="#FFFFFF"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/questionNumberTextView"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Question 1 of 10"
-            android:textSize="16sp"
-            android:textAlignment="center"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#033357"
             android:layout_marginTop="8dp"
-            android:textColor="#666666" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/testTitleTextView" />
 
         <com.google.android.material.progressindicator.LinearProgressIndicator
             android:id="@+id/progressIndicator"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp" />
-    </LinearLayout>
+            android:layout_marginTop="16dp"
+            android:progress="10"
+            app:trackThickness="10dp"
+            app:trackColor="#80FFFFFF"
+            app:indicatorColor="#4CAF50"
+            app:layout_constraintTop_toBottomOf="@id/questionNumberTextView" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/questionCard"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_margin="16dp"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="4dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="16dp"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="6dp"
         app:layout_constraintTop_toBottomOf="@id/headerLayout"
         app:layout_constraintBottom_toTopOf="@id/navigationLayout">
 
-        <ScrollView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="16dp"
+                android:background="#F8F9FA">
 
                 <TextView
-                    android:id="@+id/questionTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Question"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="#333333"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_alignParentEnd="true">
+
+
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/reportButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:text="Report"
+                        android:textAllCaps="false"
+                        android:textSize="14sp"
+                        app:iconGravity="start"
+                        app:cornerRadius="8dp"
+                        app:backgroundTint="#FF5722" />
+                </LinearLayout>
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E0E0E0" />
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="The question text will appear here"
-                    android:textSize="18sp"
-                    android:textColor="#333333" />
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
-                <RadioGroup
-                    android:id="@+id/optionsRadioGroup"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/questionTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="The question text will appear here"
+                        android:textSize="20sp"
+                        android:textColor="#333333" />
 
-                    <!-- Radio buttons will be added here dynamically -->
+                    <RadioGroup
+                        android:id="@+id/optionsRadioGroup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:orientation="vertical">
 
-                </RadioGroup>
-            </LinearLayout>
-        </ScrollView>
+                        <!-- Radio buttons will be added here dynamically -->
+
+                    </RadioGroup>
+                </LinearLayout>
+            </ScrollView>
+        </LinearLayout>
     </androidx.cardview.widget.CardView>
 
+    <!-- Changed to vertical layout for navigation buttons -->
     <LinearLayout
         android:id="@+id/navigationLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:padding="16dp"
         android:gravity="center"
-        android:layoutDirection="ltr"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <Button
-            android:id="@+id/previousButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Previous"
-            android:layout_marginEnd="8dp"
-            android:enabled="false" />
-
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/nextButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
             android:text="Next"
-            android:layout_marginStart="8dp" />
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp"
+            app:cornerRadius="20dp"
+            app:backgroundTint="#4CAF50" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/previousButton"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Previous"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:cornerRadius="20dp"
+            app:backgroundTint="@color/colorRed"
+            android:enabled="false" />
     </LinearLayout>
 
     <ProgressBar

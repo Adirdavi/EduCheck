@@ -115,10 +115,10 @@
                     <TextView
                         android:id="@+id/testDescription"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:fontFamily="sans-serif-medium"
                         android:letterSpacing="0.02"
-                        android:text="Ready to test your knowledge?"
+                        android:text="Ready?"
                         android:textColor="#212121"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -194,7 +194,7 @@
                 android:paddingBottom="10dp"
                 android:elevation="8dp"
                 app:cornerRadius="16dp"
-                app:backgroundTint="#673AB7"
+                app:backgroundTint="#2196F3"
                 app:rippleColor="#9C27B0"/>
         </FrameLayout>
     </LinearLayout>
