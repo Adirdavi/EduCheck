@@ -5,6 +5,7 @@ EduCheck is an advanced auto-grading and educational management tool designed to
 
 ## ✨ Key Features
 
+
 ### 📝 Automated Grading
 * Instantly assesses assignments and tests based on predefined criteria
 * Supports both multiple-choice and open-ended questions
