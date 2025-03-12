@@ -1,8 +1,5 @@
 # EduCheck
 
-<!-- הוסף את הלוגו שלך כאן -->
-<!-- ![EduCheck Logo](path/to/your/logo.png) -->
-
 ## 📑 Overview
 EduCheck is an advanced auto-grading and educational management tool designed to streamline the evaluation process for both educators and students. It automates test creation, grading, and feedback, providing immediate insights while reducing manual workload for teachers.
 
